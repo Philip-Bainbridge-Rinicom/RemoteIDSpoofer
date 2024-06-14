@@ -9,7 +9,7 @@ Spoofer spoofers[16];
 
 void setup() {
   Serial.begin(115200);
-  
+  pinMode(2, INPUT);
   // start the frontend and don't exit until either timer elapse or user ends it
   // the timer here is set at 2 minutes
   Frontend frontend(120000);
@@ -28,8 +28,14 @@ void setup() {
 
 void loop() {
   // do the spoofing
+  
+  for (int i = 0; i < num_spoofers; i++) {
+    spoofers[i].updateLocation(54.063923, -2.811494);
+  }
+  if(digitalRead(2) == 1){
   for (int i = 0; i < num_spoofers; i++) {
     spoofers[i].update();
     delay(200 / num_spoofers);
+  }
   }
 }
