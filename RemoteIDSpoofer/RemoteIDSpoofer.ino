@@ -21,12 +21,13 @@ char transmitChars[numChars];
 boolean newData = false;
 static boolean recvInProgress = false;
 static byte ndx = 0;
-char startMarker = '$';
+char startMarker = '#';
 char endMarker = '\r';
 char rc;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
+  Serial1.begin(9699, SERIAL_8N1, 17, 18);
   pinMode(2, INPUT);
   // start the frontend and don't exit until either timer elapse or user ends it
   // the timer here is set at 2 minutes
@@ -63,8 +64,8 @@ void loop() {
       }
   }*/
 
-  while (Serial.available() > 0 ) {
-                rc = Serial.read();
+  while (Serial1.available() > 0 ) {
+                rc = Serial1.read();
                 //Serial.print(rc);
                 if (recvInProgress == true) {
                         if (rc != endMarker) {
@@ -88,24 +89,26 @@ void loop() {
                 if (newData == true) {
                   if(receivedChars[1] == 'A'){
                       Lat = atof(receivedChars + 3);
+                      //Serial.print(Lat);
                   }
                   else if(receivedChars[1] == 'O'){
                       Lon = atof(receivedChars + 3);
+                      //Serial.print(Lon);
                   }
                 }
                 newData = false;
                 //strcpy(transmitChars, receivedChars);
-
+                for (int i = 0; i < num_spoofers; i++) {
+                spoofers[i].updateLocation(Lat, Lon);
   }
- // Serial.print(Lat);
- // Serial.print(Lon);
-                
-                
-  for (int i = 0; i < num_spoofers; i++) {
-    spoofers[i].updateLocation(Lat, Lon);
   }
+ Serial1.print(Lat);
+ Serial1.print(Lon);
+                
+  if(digitalRead(2) == 1){              
   
-  if(digitalRead(2) == 1){
+  
+  
   for (int i = 0; i < num_spoofers; i++) {
     spoofers[i].update();
     delay(200 / num_spoofers);
